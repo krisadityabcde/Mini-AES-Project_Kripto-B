@@ -11,11 +11,11 @@ Anggota:
 ## How To Install
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/Mini-AES-Project.git
+    git clone https://github.com/krisadityabcde/Mini-AES-Project_Kripto-B.git
     ```
 2. Navigate to the project directory:
     ```bash
-    cd Mini-AES-Project
+    cd Mini-AES-Project_Kripto-B
     ```
 3. Install the required dependencies:
     ```bash
