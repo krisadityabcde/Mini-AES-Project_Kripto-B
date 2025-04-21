@@ -1,6 +1,4 @@
-# src/main.py
-
-from utils import text_to_state, state_to_text
+from utils import text_to_state, state_to_text, chars_to_16bit, bit16_to_chars, bit16_to_hex
 from aes_core import sub_nibbles, shift_rows, mix_columns, add_round_key
 from key_expansion import key_expansion
 
@@ -8,49 +6,58 @@ def encrypt(plaintext, key):
     state = text_to_state(plaintext)
     round_keys = key_expansion(key)
 
-    print("Initial State:", state)
+    logs = []
+    logs.append(f"Initial State: {state}")
 
-    # Round 0
+    # Round 0 - AddRoundKey
     state = add_round_key(state, round_keys[0])
-    print("After AddRoundKey (Round 0):", state)
+    logs.append(f"After AddRoundKey (Round 0): {state}")
 
     # Round 1
     state = sub_nibbles(state)
+    logs.append(f"After SubNibbles (Round 1): {state}")
+
     state = shift_rows(state)
+    logs.append(f"After ShiftRows (Round 1): {state}")
+
     state = mix_columns(state)
+    logs.append(f"After MixColumns (Round 1): {state}")
+
     state = add_round_key(state, round_keys[1])
-    print("After Round 1:", state)
+    logs.append(f"After AddRoundKey (Round 1): {state}")
 
-    # Round 2
+    # Round 2 (Final Round)
     state = sub_nibbles(state)
+    logs.append(f"After SubNibbles (Round 2): {state}")
+
     state = shift_rows(state)
+    logs.append(f"After ShiftRows (Round 2): {state}")
+
     state = add_round_key(state, round_keys[2])
-    print("After Round 2 (Final):", state)
+    logs.append(f"After AddRoundKey (Round 2): {state}")
 
-    return state_to_text(state)
+    ciphertext = state_to_text(state)
+    logs.append(f"Ciphertext (16-bit): {ciphertext} (0x{bit16_to_hex(ciphertext)})")
 
-def ascii_to_16bit(text):
-    if len(text) != 2:
-        raise ValueError("Input harus 2 karakter ASCII (16-bit total).")
-    return (ord(text[0]) << 8) | ord(text[1])
+    return ciphertext, logs
 
-def bit16_to_ascii(val):
-    return chr((val >> 8) & 0xFF) + chr(val & 0xFF)
 
 if __name__ == "__main__":
-    plaintext_ascii = input("Masukkan plaintext (2 karakter ASCII): ")
-    key_ascii = input("Masukkan key (2 karakter ASCII): ")
+    plaintext_chars = input("Masukkan plaintext (2 karakter): ")
+    key_chars = input("Masukkan key (2 karakter): ")
 
     try:
-        plaintext = ascii_to_16bit(plaintext_ascii)
-        key = ascii_to_16bit(key_ascii)
+        plaintext = chars_to_16bit(plaintext_chars)
+        key = chars_to_16bit(key_chars)
 
-        ciphertext = encrypt(plaintext, key)
+        ciphertext, _ = encrypt(plaintext, key)
 
-        print(f"\nPlaintext (hex): {plaintext:04X}")
-        print(f"Key       (hex): {key:04X}")
-        print(f"Ciphertext (hex): {ciphertext:04X}")
-        print(f"Ciphertext (ASCII): {bit16_to_ascii(ciphertext)}")
+        print(f"\nPlaintext (chars): {plaintext_chars}")
+        print(f"Plaintext (16-bit): {plaintext} (0x{plaintext:04X})")
+        print(f"Key (chars): {key_chars}")
+        print(f"Key (16-bit): {key} (0x{key:04X})")
+        print(f"Ciphertext (16-bit): {ciphertext} (0x{ciphertext:04X})")
+        print(f"Ciphertext (chars): {bit16_to_chars(ciphertext)}")
         
     except ValueError as e:
         print("Error:", e)

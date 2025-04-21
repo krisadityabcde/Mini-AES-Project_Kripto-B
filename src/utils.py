@@ -21,3 +21,26 @@ def gf_mul(a, b):
             a ^= 0b10011
         b >>= 1
     return p & 0xF
+
+def chars_to_16bit(text):
+    """Convert a 2-character string to 16-bit value (8 bits per character)."""
+    if len(text) != 2:
+        raise ValueError("Input harus 2 karakter.")
+    return (ord(text[0]) << 8) | ord(text[1])
+
+def bit16_to_chars(val):
+    """Convert a 16-bit value back to 2 characters."""
+    return chr((val >> 8) & 0xFF) + chr(val & 0xFF)
+
+# Format conversion functions for display purposes
+def bit16_to_hex(val):
+    """Convert 16-bit value to hex string."""
+    return f"{val:04X}"
+
+def bit16_to_decimal(val):
+    """Convert 16-bit value to decimal string."""
+    return str(val)
+
+def bit16_to_binary(val):
+    """Convert 16-bit value to binary string."""
+    return f"{val:016b}"
