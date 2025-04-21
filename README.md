@@ -6,3 +6,22 @@ Anggota:
 - Michael Kenneth Salim/008
 - Rafael Ega Krisaditya/025
 - Ricko Mianto Jaya Saputra/031
+
+
+## How To Install
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/your-repo/Mini-AES-Project.git
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd Mini-AES-Project
+    ```
+3. Install the required dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+4. Run the program:
+    ```bash
+    streamlit run gui/streamlit_app.py
+    ```
