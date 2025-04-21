@@ -1,4 +1,4 @@
-# Kripto-B_Tugas-1
+# Mini AES Project_Kelas Kriptografi B
 
 Anggota:
 - Diandra Naufal Abror/004

@@ -1,0 +1,47 @@
+# Byte-compiled / cached files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment (jika kamu pakai)
+venv/
+env/
+.venv/
+
+# VSCode / PyCharm settings (opsional)
+.vscode/
+.idea/
+
+# Mac / Linux / Windows trash
+.DS_Store
+Thumbs.db
+
+# Output log / debug
+*.log
+
+# Jupyter notebook checkpoints (kalau ada)
+.ipynb_checkpoints/
+
+# Streamlit temporary files
+.streamlit/
+
+# Python testing / coverage
+.coverage
+htmlcov/
+.cache/
+.pytest_cache/
+test/__pycache__/
+
+# Documentation build artifacts
+docs/_build/
+docs/*.png
+
+# Optional: ignore test result data
+*.out
+*.bin
+
+# Optional: compiled exe (jika di-freeze pakai pyinstaller atau cx_Freeze)
+dist/
+build/
+*.spec
