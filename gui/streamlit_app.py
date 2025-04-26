@@ -2,7 +2,7 @@ import streamlit as st
 import sys
 import os
 import pandas as pd
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..\src')))
 
 from utils import chars_to_16bit, bit16_to_chars, bit16_to_hex, bit16_to_binary, bit16_to_decimal
 from main import encrypt
