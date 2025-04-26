@@ -11,7 +11,7 @@ from utils import chars_to_16bit, bit16_to_chars, bit16_to_hex, bit16_to_binary,
 from main import encrypt, decrypt
 from block_modes import ecb_encrypt, ecb_decrypt, cbc_encrypt, cbc_decrypt, generate_iv
 from avalanche import analyze_plaintext_avalanche, analyze_key_avalanche, full_avalanche_analysis
-from file_handler import save_to_txt, save_to_csv, load_from_file, parse_input_file
+from file_handler import save_to_txt, save_to_csv, load_from_file, parse_input_file, decrypt_file_content, detect_file_encryption_mode
 
 # Daftar Test Cases
 TEST_CASES = [
@@ -50,7 +50,7 @@ def main():
         st.session_state.file_upload_key = 0
     
     # Tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["Enkripsi & Dekripsi", "Mode Operasi Blok", "Analisis Avalanche", "Test Cases"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Enkripsi & Dekripsi", "Mode Operasi Blok", "File Decryption", "Analisis Avalanche", "Test Cases"])
 
     with tab1:
         st.title("🔒 Mini-AES 16-bit Encryptor & Decryptor")
@@ -317,6 +317,86 @@ def main():
                     st.error(f"Proses Gagal: {str(e)}")
 
     with tab3:
+        st.title("📄 File Decryption")
+        st.markdown("### Decrypt content from uploaded files")
+        
+        # File upload section
+        uploaded_file = st.file_uploader("Upload an encrypted file", 
+                                       key="decryption_file_upload", 
+                                       help="Upload a file that was encrypted with Mini-AES")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            decrypt_key = st.text_input("Decryption Key (2 characters):", max_chars=2, key="file_decrypt_key")
+        
+        with col2:
+            block_mode = st.radio("Block Mode:", ["ECB", "CBC"], horizontal=True)
+            
+        if uploaded_file is not None:
+            st.success(f"File uploaded: {uploaded_file.name}")
+            
+            try:
+                # Read file content
+                file_content = uploaded_file.read()
+                file_size = len(file_content)
+                
+                # Display file info
+                st.write(f"File size: {file_size} bytes")
+                
+                # Check if it's a text file we can display
+                try:
+                    preview_content = file_content.decode('utf-8')
+                    if len(preview_content) > 500:
+                        preview_content = preview_content[:500] + "...(truncated)"
+                    
+                    with st.expander("File Preview"):
+                        st.text(preview_content)
+                except UnicodeDecodeError:
+                    st.info("Binary file detected, cannot show preview.")
+                
+                # Decrypt button
+                if st.button("🔓 Decrypt File", key="decrypt_file_button"):
+                    if not decrypt_key or len(decrypt_key) != 2:
+                        st.error("Please enter a valid 2-character decryption key.")
+                    else:
+                        with st.spinner("Decrypting file..."):
+                            # Call the decrypt function
+                            result = decrypt_file_content(file_content, decrypt_key, block_mode)
+                            
+                            # Display results
+                            st.write("### Decryption Result")
+                            
+                            # Show plaintext result
+                            st.markdown("#### Decrypted content:")
+                            plaintext = result["plaintext"]
+                            
+                            # Create a download option for the decrypted content
+                            st.download_button(
+                                label="Download Decrypted Content",
+                                data=plaintext,
+                                file_name=f"decrypted_{uploaded_file.name}",
+                                mime="text/plain"
+                            )
+                            
+                            if len(plaintext) > 1000:
+                                st.text_area("Preview (truncated):", 
+                                           value=plaintext[:1000] + "...(truncated)", 
+                                           height=250)
+                            else:
+                                st.text_area("Content:", value=plaintext, height=250)
+                            
+                            # Show decryption logs
+                            with st.expander("📋 Decryption Details"):
+                                for log in result["logs"]:
+                                    st.text(log)
+                
+            except Exception as e:
+                st.error(f"Error processing file: {str(e)}")
+        else:
+            st.info("Please upload a file to decrypt.")
+
+    with tab4:  # Previously was tab3
         st.title("📊 Analisis Avalanche Effect")
         st.markdown("### Pengujian sensitivitas terhadap perubahan 1-bit")
         
@@ -438,7 +518,7 @@ def main():
                         with col2:
                             st.write("#### Perubahan Bit Key:")
                             st.metric("Rata-rata bit yang berubah", f"{summary['key_avg_bits_changed']:.2f} dari 16")
-                            st.metric("Rata-rata persentase perubahan", f"{summary['key_avg_percentage']:.1f}%")
+                            st.metric("Rata-rata persentase perubahan", f"{summary['key_avg_bits_changed']:.1f}%")
                         
                         # Visualization with charts
                         st.write("### Grafik Distribusi Perubahan Bit:")
@@ -492,7 +572,7 @@ def main():
                                 "plaintext_avg_bits_changed": f"{summary['plaintext_avg_bits_changed']:.2f}",
                                 "plaintext_avg_percentage": f"{summary['plaintext_avg_percentage']:.1f}%",
                                 "key_avg_bits_changed": f"{summary['key_avg_bits_changed']:.2f}",
-                                "key_avg_percentage": f"{summary['key_avg_percentage']:.1f}%",
+                                "key_avg_percentage": f"{summary['key_avg_bits_changed']:.1f}%",
                                 "logs": [
                                     f"Plaintext Analysis: Average {summary['plaintext_avg_bits_changed']:.2f} bits changed ({summary['plaintext_avg_percentage']:.1f}%)",
                                     f"Key Analysis: Average {summary['key_avg_bits_changed']:.2f} bits changed ({summary['key_avg_bits_changed']:.1f}%)",
@@ -509,7 +589,7 @@ def main():
                 except Exception as e:
                     st.error(f"Analisis Gagal: {str(e)}")
 
-    with tab4:
+    with tab5:
         st.title("🧪 Mini-AES Test Cases")
         st.markdown("Run test cases untuk verifikasi implementasi.")
 

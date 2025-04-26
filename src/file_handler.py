@@ -127,3 +127,44 @@ def parse_input_file(filename):
     except Exception as e:
         # If all parsing fails, just return the raw content as input
         return {'input': load_from_file(filename), 'error': str(e)}
+
+def decrypt_file_content(file_content, key, block_mode="ECB"):
+    """Decrypt the content of a file using the specified key and block mode."""
+    from block_modes import ecb_decrypt, cbc_decrypt
+    
+    if not file_content or not key:
+        raise ValueError("Both file content and key are required for decryption")
+        
+    # Convert bytes to string if needed
+    if isinstance(file_content, bytes):
+        try:
+            file_content = file_content.decode('utf-8')
+        except UnicodeDecodeError:
+            # If we can't decode as UTF-8, convert to hex string
+            file_content = ''.join(f'{b:02x}' for b in file_content)
+    
+    # Trim key to 2 characters if longer
+    key = key[:2]
+    
+    # Perform decryption based on block mode
+    if block_mode.upper() == "ECB":
+        plaintext, logs = ecb_decrypt(file_content, key)
+    elif block_mode.upper() == "CBC":
+        plaintext, logs = cbc_decrypt(file_content, key)
+    else:
+        raise ValueError(f"Unsupported block mode: {block_mode}")
+    
+    return {
+        "plaintext": plaintext,
+        "logs": logs,
+        "block_mode": block_mode.upper()
+    }
+
+def detect_file_encryption_mode(file_content):
+    """Attempt to detect if the file content is encrypted with CBC (has IV) or ECB."""
+    # This is a simple heuristic - CBC mode in this implementation prepends the IV (2 chars)
+    # More sophisticated detection would be needed for real-world use
+    
+    # Check if the file seems to have a structured format that would indicate CBC
+    # For now, we'll just assume ECB as the default
+    return "ECB"
