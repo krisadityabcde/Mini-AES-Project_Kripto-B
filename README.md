@@ -191,7 +191,12 @@ Sudah Menggunakan streamlit untuk tampilannya
 
 # Flowchart Mini-AES dan Key Expansion 
 
+### Mini-AES
+![Image](https://github.com/user-attachments/assets/74fe7366-6803-4851-9195-5e753b8db14d)
 
+
+### Key Expansion
+![Image](https://github.com/user-attachments/assets/86476714-704f-408c-9460-c4ee35b481d0)
 
 # Kelebihan dan keterbatasan Mini-AES
 
